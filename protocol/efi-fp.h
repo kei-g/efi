@@ -52,7 +52,7 @@ typedef struct EFI_FILE_SYSTEM_INFO {
 } EFI_FILE_SYSTEM_INFO;
 
 typedef struct EFI_FILE_SYSTEM_VOLUME_LABEL {
-    CHAR16 VolumeLabel[];
+    CHAR16 VolumeLabel[1];
 } EFI_FILE_SYSTEM_VOLUME_LABEL;
 
 typedef struct EFI_FILE_IO_TOKEN {
