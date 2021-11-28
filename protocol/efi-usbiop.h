@@ -1,0 +1,317 @@
+/*
+ * efi-usbiop.h
+ *
+ * USB I/O Protocol.
+ */
+
+#ifndef __EFI_USBIOP_H
+#define __EFI_USBIOP_H
+
+#include <efi.h>
+
+#define USB_MASS_STORE_CLASS 0x08
+
+#define USB_MASS_STORE_RBC 0x01   ///< Reduced Block Commands
+#define USB_MASS_STORE_8020I 0x02 ///< SFF-8020i, typically a CD/DVD device
+#define USB_MASS_STORE_QIC 0x03   ///< Typically a tape device
+#define USB_MASS_STORE_UFI 0x04   ///< Typically a floppy disk driver device
+#define USB_MASS_STORE_8070I 0x05 ///< SFF-8070i, typically a floppy disk driver device.
+#define USB_MASS_STORE_SCSI 0x06  ///< SCSI transparent command set
+
+#define USB_MASS_STORE_CBI0 0x00 ///< CBI protocol with command completion interrupt
+#define USB_MASS_STORE_CBI1 0x01 ///< CBI protocol without command completion interrupt
+#define USB_MASS_STORE_BOT 0x50  ///< Bulk-Only Transport
+
+#define USB_DEV_GET_STATUS 0x00
+#define USB_DEV_GET_STATUS_REQ_TYPE_D 0x80 // Receiver : Device
+#define USB_DEV_GET_STATUS_REQ_TYPE_I 0x81 // Receiver : Interface
+#define USB_DEV_GET_STATUS_REQ_TYPE_E 0x82 // Receiver : Endpoint
+
+#define USB_DEV_CLEAR_FEATURE 0x01
+#define USB_DEV_CLEAR_FEATURE_REQ_TYPE_D 0x00 // Receiver : Device
+#define USB_DEV_CLEAR_FEATURE_REQ_TYPE_I 0x01 // Receiver : Interface
+#define USB_DEV_CLEAR_FEATURE_REQ_TYPE_E 0x02 // Receiver : Endpoint
+
+#define USB_DEV_SET_FEATURE 0x03
+#define USB_DEV_SET_FEATURE_REQ_TYPE_D 0x00 // Receiver : Device
+#define USB_DEV_SET_FEATURE_REQ_TYPE_I 0x01 // Receiver : Interface
+#define USB_DEV_SET_FEATURE_REQ_TYPE_E 0x02 // Receiver : Endpoint
+
+#define USB_DEV_SET_ADDRESS 0x05
+#define USB_DEV_SET_ADDRESS_REQ_TYPE 0x00
+
+#define USB_DEV_GET_DESCRIPTOR 0x06
+#define USB_DEV_GET_DESCRIPTOR_REQ_TYPE 0x80
+
+#define USB_DEV_SET_DESCRIPTOR 0x07
+#define USB_DEV_SET_DESCRIPTOR_REQ_TYPE 0x00
+
+#define USB_DEV_GET_CONFIGURATION 0x08
+#define USB_DEV_GET_CONFIGURATION_REQ_TYPE 0x80
+
+#define USB_DEV_SET_CONFIGURATION 0x09
+#define USB_DEV_SET_CONFIGURATION_REQ_TYPE 0x00
+
+#define USB_DEV_GET_INTERFACE 0x0A
+#define USB_DEV_GET_INTERFACE_REQ_TYPE 0x81
+
+#define USB_DEV_SET_INTERFACE 0x0B
+#define USB_DEV_SET_INTERFACE_REQ_TYPE 0x01
+
+#define USB_DEV_SYNCH_FRAME 0x0C
+#define USB_DEV_SYNCH_FRAME_REQ_TYPE 0x82
+
+#pragma pack(1)
+
+typedef struct {
+  UINT8 RequestType;
+  UINT8 Request;
+  UINT16 Value;
+  UINT16 Index;
+  UINT16 Length;
+} EFI_USB_DEVICE_REQUEST;
+
+typedef struct {
+  UINT8 Length;
+  UINT8 DescriptorType;
+  UINT16 BcdUSB;
+  UINT8 DeviceClass;
+  UINT8 DeviceSubClass;
+  UINT8 DeviceProtocol;
+  UINT8 MaxPacketSize0;
+  UINT16 IdVendor;
+  UINT16 IdProduct;
+  UINT16 BcdDevice;
+  UINT8 StrManufacturer;
+  UINT8 StrProduct;
+  UINT8 StrSerialNumber;
+  UINT8 NumConfigurations;
+} EFI_USB_DEVICE_DESCRIPTOR;
+
+typedef struct {
+  UINT8 Length;
+  UINT8 DescriptorType;
+  UINT16 TotalLength;
+  UINT8 NumInterfaces;
+  UINT8 ConfigurationValue;
+  UINT8 Configuration;
+  UINT8 Attributes;
+  UINT8 MaxPower;
+} EFI_USB_CONFIG_DESCRIPTOR;
+
+typedef struct {
+  UINT8 Length;
+  UINT8 DescriptorType;
+  UINT8 InterfaceNumber;
+  UINT8 AlternateSetting;
+  UINT8 NumEndpoints;
+  UINT8 InterfaceClass;
+  UINT8 InterfaceSubClass;
+  UINT8 InterfaceProtocol;
+  UINT8 Interface;
+} EFI_USB_INTERFACE_DESCRIPTOR;
+
+typedef struct {
+  UINT8 Length;
+  UINT8 DescriptorType;
+  UINT8 EndpointAddress;
+  UINT8 Attributes;
+  UINT16 MaxPacketSize;
+  UINT8 Interval;
+} EFI_USB_ENDPOINT_DESCRIPTOR;
+
+typedef struct {
+  UINT8 Length;
+  UINT8 DescriptorType;
+  CHAR16 String[1];
+} EFI_USB_STRING_DESCRIPTOR;
+
+#pragma pack()
+
+typedef enum {
+  USB_REQ_TYPE_STANDARD = (0x00 << 5),
+  USB_REQ_TYPE_CLASS = (0x01 << 5),
+  USB_REQ_TYPE_VENDOR = (0x02 << 5),
+
+  USB_REQ_GET_STATUS = 0x00,
+  USB_REQ_CLEAR_FEATURE = 0x01,
+  USB_REQ_SET_FEATURE = 0x03,
+  USB_REQ_SET_ADDRESS = 0x05,
+  USB_REQ_GET_DESCRIPTOR = 0x06,
+  USB_REQ_SET_DESCRIPTOR = 0x07,
+  USB_REQ_GET_CONFIG = 0x08,
+  USB_REQ_SET_CONFIG = 0x09,
+  USB_REQ_GET_INTERFACE = 0x0A,
+  USB_REQ_SET_INTERFACE = 0x0B,
+  USB_REQ_SYNCH_FRAME = 0x0C,
+
+  USB_TARGET_DEVICE = 0,
+  USB_TARGET_INTERFACE = 0x01,
+  USB_TARGET_ENDPOINT = 0x02,
+  USB_TARGET_OTHER = 0x03,
+
+  USB_DESC_TYPE_DEVICE = 0x01,
+  USB_DESC_TYPE_CONFIG = 0x02,
+  USB_DESC_TYPE_STRING = 0x03,
+  USB_DESC_TYPE_INTERFACE = 0x04,
+  USB_DESC_TYPE_ENDPOINT = 0x05,
+  USB_DESC_TYPE_HID = 0x21,
+  USB_DESC_TYPE_REPORT = 0x22,
+
+  USB_FEATURE_ENDPOINT_HALT = 0,
+
+  USB_ENDPOINT_CONTROL = 0x00,
+  USB_ENDPOINT_ISO = 0x01,
+  USB_ENDPOINT_BULK = 0x02,
+  USB_ENDPOINT_INTERRUPT = 0x03,
+
+  USB_ENDPOINT_TYPE_MASK = 0x03,
+  USB_ENDPOINT_DIR_IN = 0x80,
+
+  EFI_USB_INTERRUPT_DELAY = 2000000
+} USB_TYPES_DEFINITION;
+
+#define USB_HID_GET_DESCRIPTOR_REQ_TYPE 0x81
+
+#define USB_HID_CLASS_GET_REQ_TYPE 0xa1
+#define USB_HID_CLASS_SET_REQ_TYPE 0x21
+
+#define HID_ITEM_FORMAT_SHORT 0
+#define HID_ITEM_FORMAT_LONG 1
+
+#define HID_ITEM_TAG_LONG 15
+
+#define HID_ITEM_TYPE_MAIN 0
+#define HID_ITEM_TYPE_GLOBAL 1
+#define HID_ITEM_TYPE_LOCAL 2
+#define HID_ITEM_TYPE_RESERVED 3
+
+#define HID_MAIN_ITEM_TAG_INPUT 8
+#define HID_MAIN_ITEM_TAG_OUTPUT 9
+#define HID_MAIN_ITEM_TAG_FEATURE 11
+#define HID_MAIN_ITEM_TAG_BEGIN_COLLECTION 10
+#define HID_MAIN_ITEM_TAG_END_COLLECTION 12
+
+#define HID_MAIN_ITEM_CONSTANT 0x001
+#define HID_MAIN_ITEM_VARIABLE 0x002
+#define HID_MAIN_ITEM_RELATIVE 0x004
+#define HID_MAIN_ITEM_WRAP 0x008
+#define HID_MAIN_ITEM_NONLINEAR 0x010
+#define HID_MAIN_ITEM_NO_PREFERRED 0x020
+#define HID_MAIN_ITEM_NULL_STATE 0x040
+#define HID_MAIN_ITEM_VOLATILE 0x080
+#define HID_MAIN_ITEM_BUFFERED_BYTE 0x100
+
+#define HID_COLLECTION_PHYSICAL 0
+#define HID_COLLECTION_APPLICATION 1
+#define HID_COLLECTION_LOGICAL 2
+
+#define HID_GLOBAL_ITEM_TAG_USAGE_PAGE 0
+#define HID_GLOBAL_ITEM_TAG_LOGICAL_MINIMUM 1
+#define HID_GLOBAL_ITEM_TAG_LOGICAL_MAXIMUM 2
+#define HID_GLOBAL_ITEM_TAG_PHYSICAL_MINIMUM 3
+#define HID_GLOBAL_ITEM_TAG_PHYSICAL_MAXIMUM 4
+#define HID_GLOBAL_ITEM_TAG_UNIT_EXPONENT 5
+#define HID_GLOBAL_ITEM_TAG_UNIT 6
+#define HID_GLOBAL_ITEM_TAG_REPORT_SIZE 7
+#define HID_GLOBAL_ITEM_TAG_REPORT_ID 8
+#define HID_GLOBAL_ITEM_TAG_REPORT_COUNT 9
+#define HID_GLOBAL_ITEM_TAG_PUSH 10
+#define HID_GLOBAL_ITEM_TAG_POP 11
+
+#define HID_LOCAL_ITEM_TAG_USAGE 0
+#define HID_LOCAL_ITEM_TAG_USAGE_MINIMUM 1
+#define HID_LOCAL_ITEM_TAG_USAGE_MAXIMUM 2
+#define HID_LOCAL_ITEM_TAG_DESIGNATOR_INDEX 3
+#define HID_LOCAL_ITEM_TAG_DESIGNATOR_MINIMUM 4
+#define HID_LOCAL_ITEM_TAG_DESIGNATOR_MAXIMUM 5
+#define HID_LOCAL_ITEM_TAG_STRING_INDEX 7
+#define HID_LOCAL_ITEM_TAG_STRING_MINIMUM 8
+#define HID_LOCAL_ITEM_TAG_STRING_MAXIMUM 9
+#define HID_LOCAL_ITEM_TAG_DELIMITER 10
+
+#define HID_INPUT_REPORT 1
+#define HID_OUTPUT_REPORT 2
+#define HID_FEATURE_REPORT 3
+
+#define EFI_USB_GET_REPORT_REQUEST 0x01
+#define EFI_USB_GET_IDLE_REQUEST 0x02
+#define EFI_USB_GET_PROTOCOL_REQUEST 0x03
+#define EFI_USB_SET_REPORT_REQUEST 0x09
+#define EFI_USB_SET_IDLE_REQUEST 0x0a
+#define EFI_USB_SET_PROTOCOL_REQUEST 0x0b
+
+#pragma pack(1)
+
+typedef struct hid_class_descriptor {
+  UINT8 DescriptorType;
+  UINT16 DescriptorLength;
+} EFI_USB_HID_CLASS_DESCRIPTOR;
+
+typedef struct hid_descriptor {
+  UINT8 Length;
+  UINT8 DescriptorType;
+  UINT16 BcdHID;
+  UINT8 CountryCode;
+  UINT8 NumDescriptors;
+  EFI_USB_HID_CLASS_DESCRIPTOR HidClassDesc[1];
+} EFI_USB_HID_DESCRIPTOR;
+
+#pragma pack()
+
+#define EFI_USB_IO_PROTOCOL_GUID                                                   \
+  {                                                                                \
+    0x2B2F68D6, 0x0CD2, 0x44cf, { 0x8E, 0x8B, 0xBB, 0xA2, 0x0B, 0x1B, 0x5B, 0x75 } \
+  }
+
+typedef struct _EFI_USB_IO_PROTOCOL EFI_USB_IO_PROTOCOL;
+
+typedef enum {
+  EfiUsbDataIn,
+  EfiUsbDataOut,
+  EfiUsbNoData
+} EFI_USB_DATA_DIRECTION;
+
+#define EFI_USB_NOERROR 0x00
+#define EFI_USB_ERR_NOTEXECUTE 0x01
+#define EFI_USB_ERR_STALL 0x02
+#define EFI_USB_ERR_BUFFER 0x04
+#define EFI_USB_ERR_BABBLE 0x08
+#define EFI_USB_ERR_NAK 0x10
+#define EFI_USB_ERR_CRC 0x20
+#define EFI_USB_ERR_TIMEOUT 0x40
+#define EFI_USB_ERR_BITSTUFF 0x80
+#define EFI_USB_ERR_SYSTEM 0x100
+
+typedef EFI_STATUS (*EFI_ASYNC_USB_TRANSFER_CALLBACK)(VOID *Data, UINTN DataLength, VOID *Context, UINT32 Status);
+typedef EFI_STATUS (*EFI_USB_IO_CONTROL_TRANSFER)(EFI_USB_IO_PROTOCOL *This, EFI_USB_DEVICE_REQUEST *Request, EFI_USB_DATA_DIRECTION Direction, UINT32 Timeout, OUT VOID *Data, UINTN DataLength, UINT32 *Status);
+typedef EFI_STATUS (*EFI_USB_IO_BULK_TRANSFER)(EFI_USB_IO_PROTOCOL *This, UINT8 DeviceEndpoint, OUT VOID *Data, OUT UINTN *DataLength, UINTN Timeout, UINT32 *Status);
+typedef EFI_STATUS (*EFI_USB_IO_ASYNC_INTERRUPT_TRANSFER)(EFI_USB_IO_PROTOCOL *This, UINT8 DeviceEndpoint, BOOLEAN IsNewTransfer, UINTN PollingInterval, UINTN DataLength, EFI_ASYNC_USB_TRANSFER_CALLBACK InterruptCallBack, VOID *Context);
+typedef EFI_STATUS (*EFI_USB_IO_SYNC_INTERRUPT_TRANSFER)(EFI_USB_IO_PROTOCOL *This, UINT8 DeviceEndpoint, VOID *Data, UINTN *DataLength, UINTN Timeout, UINT32 *Status);
+typedef EFI_STATUS (*EFI_USB_IO_ISOCHRONOUS_TRANSFER)(EFI_USB_IO_PROTOCOL *This, UINT8 DeviceEndpoint, VOID *Data, UINTN DataLength, UINT32 *Status);
+typedef EFI_STATUS (*EFI_USB_IO_ASYNC_ISOCHRONOUS_TRANSFER)(EFI_USB_IO_PROTOCOL *This, UINT8 DeviceEndpoint, VOID *Data, UINTN DataLength, EFI_ASYNC_USB_TRANSFER_CALLBACK IsochronousCallBack, VOID *Context);
+typedef EFI_STATUS (*EFI_USB_IO_PORT_RESET)(EFI_USB_IO_PROTOCOL *This);
+typedef EFI_STATUS (*EFI_USB_IO_GET_DEVICE_DESCRIPTOR)(EFI_USB_IO_PROTOCOL *This, EFI_USB_DEVICE_DESCRIPTOR *DeviceDescriptor);
+typedef EFI_STATUS (*EFI_USB_IO_GET_CONFIG_DESCRIPTOR)(EFI_USB_IO_PROTOCOL *This, EFI_USB_CONFIG_DESCRIPTOR *ConfigurationDescriptor);
+typedef EFI_STATUS (*EFI_USB_IO_GET_INTERFACE_DESCRIPTOR)(EFI_USB_IO_PROTOCOL *This, EFI_USB_INTERFACE_DESCRIPTOR *InterfaceDescriptor);
+typedef EFI_STATUS (*EFI_USB_IO_GET_ENDPOINT_DESCRIPTOR)(FI_USB_IO_PROTOCOL *This, UINT8 EndpointIndex, EFI_USB_ENDPOINT_DESCRIPTOR *EndpointDescriptor);
+typedef EFI_STATUS (*EFI_USB_IO_GET_STRING_DESCRIPTOR)(EFI_USB_IO_PROTOCOL *This, UINT16 LangID, UINT8 StringID, CHAR16 **String);
+typedef EFI_STATUS (*EFI_USB_IO_GET_SUPPORTED_LANGUAGE)(EFI_USB_IO_PROTOCOL *This, UINT16 **LangIDTable, UINT16 *TableSize);
+
+struct _EFI_USB_IO_PROTOCOL {
+  EFI_USB_IO_CONTROL_TRANSFER UsbControlTransfer;
+  EFI_USB_IO_BULK_TRANSFER UsbBulkTransfer;
+  EFI_USB_IO_ASYNC_INTERRUPT_TRANSFER UsbAsyncInterruptTransfer;
+  EFI_USB_IO_SYNC_INTERRUPT_TRANSFER UsbSyncInterruptTransfer;
+  EFI_USB_IO_ISOCHRONOUS_TRANSFER UsbIsochronousTransfer;
+  EFI_USB_IO_ASYNC_ISOCHRONOUS_TRANSFER UsbAsyncIsochronousTransfer;
+  EFI_USB_IO_GET_DEVICE_DESCRIPTOR UsbGetDeviceDescriptor;
+  EFI_USB_IO_GET_CONFIG_DESCRIPTOR UsbGetConfigDescriptor;
+  EFI_USB_IO_GET_INTERFACE_DESCRIPTOR UsbGetInterfaceDescriptor;
+  EFI_USB_IO_GET_ENDPOINT_DESCRIPTOR UsbGetEndpointDescriptor;
+  EFI_USB_IO_GET_STRING_DESCRIPTOR UsbGetStringDescriptor;
+  EFI_USB_IO_GET_SUPPORTED_LANGUAGE UsbGetSupportedLanguages;
+  EFI_USB_IO_PORT_RESET UsbPortReset;
+};
+
+#endif /* __EFI_USBIOP_H */

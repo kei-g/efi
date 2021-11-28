@@ -1,0 +1,119 @@
+/*
+ * efi-usb2hcp.h
+ *
+ * USB2 Host Controller Protocol.
+ */
+
+#ifndef __EFI_USB2HCP_H
+#define __EFI_USB2HCP_H
+
+#include <efi.h>
+#include <protocol/efi-usbiop.h>
+
+#define EFI_USB2_HC_PROTOCOL_GUID                                                 \
+  {                                                                               \
+    0x3e745226, 0x9818, 0x45b6, { 0xa2, 0xac, 0xd7, 0xcd, 0xe, 0x8b, 0xa2, 0xbc } \
+  }
+
+typedef struct _EFI_USB2_HC_PROTOCOL EFI_USB2_HC_PROTOCOL;
+
+typedef struct {
+  UINT16 PortStatus;
+  UINT16 PortChangeStatus;
+} EFI_USB_PORT_STATUS;
+
+#define USB_PORT_STAT_CONNECTION 0x0001
+#define USB_PORT_STAT_ENABLE 0x0002
+#define USB_PORT_STAT_SUSPEND 0x0004
+#define USB_PORT_STAT_OVERCURRENT 0x0008
+#define USB_PORT_STAT_RESET 0x0010
+#define USB_PORT_STAT_POWER 0x0100
+#define USB_PORT_STAT_LOW_SPEED 0x0200
+#define USB_PORT_STAT_HIGH_SPEED 0x0400
+#define USB_PORT_STAT_SUPER_SPEED 0x0800
+#define USB_PORT_STAT_OWNER 0x2000
+
+#define USB_PORT_STAT_C_CONNECTION 0x0001
+#define USB_PORT_STAT_C_ENABLE 0x0002
+#define USB_PORT_STAT_C_SUSPEND 0x0004
+#define USB_PORT_STAT_C_OVERCURRENT 0x0008
+#define USB_PORT_STAT_C_RESET 0x0010
+
+typedef enum {
+  EfiUsbPortEnable = 1,
+  EfiUsbPortSuspend = 2,
+  EfiUsbPortReset = 4,
+  EfiUsbPortPower = 8,
+  EfiUsbPortOwner = 13,
+  EfiUsbPortConnectChange = 16,
+  EfiUsbPortEnableChange = 17,
+  EfiUsbPortSuspendChange = 18,
+  EfiUsbPortOverCurrentChange = 19,
+  EfiUsbPortResetChange = 20
+} EFI_USB_PORT_FEATURE;
+
+#define EFI_USB_SPEED_FULL 0x0000  ///< 12 Mb/s, USB 1.1 OHCI and UHCI HC.
+#define EFI_USB_SPEED_LOW 0x0001   ///< 1 Mb/s, USB 1.1 OHCI and UHCI HC.
+#define EFI_USB_SPEED_HIGH 0x0002  ///< 480 Mb/s, USB 2.0 EHCI HC.
+#define EFI_USB_SPEED_SUPER 0x0003 ///< 4.8 Gb/s, USB 3.0 XHCI HC.
+
+typedef struct {
+  UINT8 TranslatorHubAddress;
+  UINT8 TranslatorPortNumber;
+} EFI_USB2_HC_TRANSACTION_TRANSLATOR;
+
+typedef EFI_STATUS (*EFI_USB2_HC_PROTOCOL_GET_CAPABILITY)(EFI_USB2_HC_PROTOCOL *This, UINT8 *MaxSpeed, UINT8 *PortNumber, UINT8 *Is64BitCapable);
+
+#define EFI_USB_HC_RESET_GLOBAL 0x0001
+#define EFI_USB_HC_RESET_HOST_CONTROLLER 0x0002
+#define EFI_USB_HC_RESET_GLOBAL_WITH_DEBUG 0x0004
+#define EFI_USB_HC_RESET_HOST_WITH_DEBUG 0x0008
+
+typedef EFI_STATUS (*EFI_USB2_HC_PROTOCOL_RESET)(EFI_USB2_HC_PROTOCOL *This, UINT16 Attributes);
+
+typedef enum {
+  EfiUsbHcStateHalt,
+  EfiUsbHcStateOperational,
+  EfiUsbHcStateSuspend,
+  EfiUsbHcStateMaximum
+} EFI_USB_HC_STATE;
+
+typedef EFI_STATUS (*EFI_USB2_HC_PROTOCOL_GET_STATE)(EFI_USB2_HC_PROTOCOL *This, EFI_USB_HC_STATE *State);
+typedef EFI_STATUS (*EFI_USB2_HC_PROTOCOL_SET_STATE)(EFI_USB2_HC_PROTOCOL *This, EFI_USB_HC_STATE State);
+typedef EFI_STATUS (*EFI_USB2_HC_PROTOCOL_CONTROL_TRANSFER)(EFI_USB2_HC_PROTOCOL *This, UINT8 DeviceAddress, UINT8 DeviceSpeed, UINTN MaximumPacketLength, EFI_USB_DEVICE_REQUEST *Request, EFI_USB_DATA_DIRECTION TransferDirection, VOID *Data, UINTN *DataLength, UINTN TimeOut, EFI_USB2_HC_TRANSACTION_TRANSLATOR *Translator, UINT32 *TransferResult);
+
+#define EFI_USB_MAX_BULK_BUFFER_NUM 10
+
+typedef EFI_STATUS (*EFI_USB2_HC_PROTOCOL_BULK_TRANSFER)(EFI_USB2_HC_PROTOCOL *This, UINT8 DeviceAddress, UINT8 EndPointAddress, UINT8 DeviceSpeed, UINTN MaximumPacketLength, UINT8 DataBuffersNumber, VOID *Data[EFI_USB_MAX_BULK_BUFFER_NUM], UINTN *DataLength, UINT8 *DataToggle, UINTN TimeOut, EFI_USB2_HC_TRANSACTION_TRANSLATOR *Translator, UINT32 *TransferResult);
+typedef EFI_STATUS (*EFI_USB2_HC_PROTOCOL_ASYNC_INTERRUPT_TRANSFER)(EFI_USB2_HC_PROTOCOL *This, UINT8 DeviceAddress, UINT8 EndPointAddress, UINT8 DeviceSpeed, UINTN MaxiumPacketLength, BOOLEAN IsNewTransfer, UINT8 *DataToggle, UINTN PollingInterval, UINTN DataLength, EFI_USB2_HC_TRANSACTION_TRANSLATOR *Translator, EFI_ASYNC_USB_TRANSFER_CALLBACK CallBackFunction, VOID *Context);
+
+typedef EFI_STATUS (*EFI_USB2_HC_PROTOCOL_SYNC_INTERRUPT_TRANSFER)(EFI_USB2_HC_PROTOCOL *This, UINT8 DeviceAddress, UINT8 EndPointAddress, UINT8 DeviceSpeed, UINTN MaximumPacketLength, VOID *Data, UINTN *DataLength, UINT8 *DataToggle, UINTN TimeOut, EFI_USB2_HC_TRANSACTION_TRANSLATOR *Translator, UINT32 *TransferResult);
+
+#define EFI_USB_MAX_ISO_BUFFER_NUM 7
+#define EFI_USB_MAX_ISO_BUFFER_NUM1 2
+
+typedef EFI_STATUS (*EFI_USB2_HC_PROTOCOL_ISOCHRONOUS_TRANSFER)(EFI_USB2_HC_PROTOCOL *This, UINT8 DeviceAddress, UINT8 EndPointAddress, UINT8 DeviceSpeed, UINTN MaximumPacketLength, UINT8 DataBuffersNumber, VOID *Data[EFI_USB_MAX_ISO_BUFFER_NUM], UINTN DataLength, EFI_USB2_HC_TRANSACTION_TRANSLATOR *Translator, UINT32 *TransferResult);
+typedef EFI_STATUS (*EFI_USB2_HC_PROTOCOL_ASYNC_ISOCHRONOUS_TRANSFER)(EFI_USB2_HC_PROTOCOL *This, UINT8 DeviceAddress, UINT8 EndPointAddress, UINT8 DeviceSpeed, UINTN MaximumPacketLength, UINT8 DataBuffersNumber, VOID *Data[EFI_USB_MAX_ISO_BUFFER_NUM], UINTN DataLength, EFI_USB2_HC_TRANSACTION_TRANSLATOR *Translator, EFI_ASYNC_USB_TRANSFER_CALLBACK IsochronousCallBack, VOID *Context);
+typedef EFI_STATUS (*EFI_USB2_HC_PROTOCOL_GET_ROOTHUB_PORT_STATUS)(EFI_USB2_HC_PROTOCOL *This, UINT8 PortNumber, EFI_USB_PORT_STATUS *PortStatus);
+typedef EFI_STATUS (*EFI_USB2_HC_PROTOCOL_SET_ROOTHUB_PORT_FEATURE)(EFI_USB2_HC_PROTOCOL *This, UINT8 PortNumber, EFI_USB_PORT_FEATURE PortFeature);
+typedef EFI_STATUS (*EFI_USB2_HC_PROTOCOL_CLEAR_ROOTHUB_PORT_FEATURE)(EFI_USB2_HC_PROTOCOL *This, UINT8 PortNumber, EFI_USB_PORT_FEATURE PortFeature);
+
+struct _EFI_USB2_HC_PROTOCOL {
+  EFI_USB2_HC_PROTOCOL_GET_CAPABILITY GetCapability;
+  EFI_USB2_HC_PROTOCOL_RESET Reset;
+  EFI_USB2_HC_PROTOCOL_GET_STATE GetState;
+  EFI_USB2_HC_PROTOCOL_SET_STATE SetState;
+  EFI_USB2_HC_PROTOCOL_CONTROL_TRANSFER ControlTransfer;
+  EFI_USB2_HC_PROTOCOL_BULK_TRANSFER BulkTransfer;
+  EFI_USB2_HC_PROTOCOL_ASYNC_INTERRUPT_TRANSFER AsyncInterruptTransfer;
+  EFI_USB2_HC_PROTOCOL_SYNC_INTERRUPT_TRANSFER SyncInterruptTransfer;
+  EFI_USB2_HC_PROTOCOL_ISOCHRONOUS_TRANSFER IsochronousTransfer;
+  EFI_USB2_HC_PROTOCOL_ASYNC_ISOCHRONOUS_TRANSFER AsyncIsochronousTransfer;
+  EFI_USB2_HC_PROTOCOL_GET_ROOTHUB_PORT_STATUS GetRootHubPortStatus;
+  EFI_USB2_HC_PROTOCOL_SET_ROOTHUB_PORT_FEATURE SetRootHubPortFeature;
+  EFI_USB2_HC_PROTOCOL_CLEAR_ROOTHUB_PORT_FEATURE ClearRootHubPortFeature;
+  UINT16 MajorRevision;
+  UINT16 MinorRevision;
+};
+
+#endif /* __EFI_USB2HCP_H */
