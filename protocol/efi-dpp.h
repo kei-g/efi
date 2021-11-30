@@ -79,6 +79,8 @@ typedef struct EFI_DEVICE_PATH_PROTOCOL {
   UINT8 Length[2];
 } EFI_DEVICE_PATH_PROTOCOL;
 
+#include <efi-types.h>
+
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL Header;
   UINT8 Function;
