@@ -12,7 +12,7 @@
 
 // EFIABI can be defined to __attribute__((ms_abi)) for example
 #ifndef EFIABI
-#define EFIABI
+#define EFIABI __attribute__((ms_abi))
 #endif
 
 
