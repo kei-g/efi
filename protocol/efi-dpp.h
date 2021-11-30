@@ -371,7 +371,7 @@ typedef struct {
 
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL Header;
-  BLUETOOTH_ADDRESS BD_ADDR;
+  EFI_BLUETOOTH_ADDRESS BD_ADDR;
 } EFI_BLUETOOTH_DEVICE_PATH;
 
 typedef struct {
