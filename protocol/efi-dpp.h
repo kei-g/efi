@@ -206,7 +206,7 @@ typedef struct {
   EFI_DEVICE_PATH_PROTOCOL Header;
   UINT16 InterfaceNumber;
   UINT16 VendorId;
-  UINT16 ProductId
+  UINT16 ProductId;
 } EFI_USB_WWID_DEVICE_PATH;
 
 typedef struct {
