@@ -15,7 +15,7 @@
 #define EFI_LOADED_IMAGE_PROTOCOL_REVISION  0x1000
 
 
-typedef EFI_STATUS (*EFI_IMAGE_UNLOAD)(EFI_HANDLE ImageHandle);
+typedef EFI_STATUS (*EFIABI EFI_IMAGE_UNLOAD)(EFI_HANDLE ImageHandle);
 
 typedef struct EFI_LOADED_IMAGE_PROTOCOL {
     UINT32                      Revision;
